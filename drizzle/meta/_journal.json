@@ -15,6 +15,13 @@
       "when": 1770478719123,
       "tag": "0001_sour_winter_soldier",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1770489036364,
+      "tag": "0002_omniscient_warbird",
+      "breakpoints": true
     }
   ]
 }

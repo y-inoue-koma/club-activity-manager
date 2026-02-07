@@ -7,6 +7,9 @@ import {
   practiceMenus, InsertPracticeMenu,
   playerRecords, InsertPlayerRecord,
   absences, InsertAbsence,
+  battingStats, pitchingStats, pitchVelocity,
+  exitVelocity, pulldownVelocity, physicalMeasurements,
+  gameResults, teamStats,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -245,4 +248,220 @@ export async function getSchedulesForDate(dateStr: string) {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(schedules).where(sql`${schedules.eventDate} = ${dateStr}`);
+}
+
+// ── Batting Stats ──
+export async function getBattingStatsByMember(memberId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(battingStats).where(eq(battingStats.memberId, memberId));
+}
+
+export async function listAllBattingStats() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({
+    id: battingStats.id,
+    memberId: battingStats.memberId,
+    memberName: members.name,
+    grade: members.grade,
+    position: members.position,
+    uniformNumber: members.uniformNumber,
+    period: battingStats.period,
+    games: battingStats.games,
+    plateAppearances: battingStats.plateAppearances,
+    atBats: battingStats.atBats,
+    runs: battingStats.runs,
+    hits: battingStats.hits,
+    singles: battingStats.singles,
+    doubles: battingStats.doubles,
+    triples: battingStats.triples,
+    homeRuns: battingStats.homeRuns,
+    totalBases: battingStats.totalBases,
+    rbis: battingStats.rbis,
+    stolenBases: battingStats.stolenBases,
+    sacrificeBunts: battingStats.sacrificeBunts,
+    sacrificeFlies: battingStats.sacrificeFlies,
+    walks: battingStats.walks,
+    strikeouts: battingStats.strikeouts,
+    errors: battingStats.errors,
+    battingAvg: battingStats.battingAvg,
+    onBasePercentage: battingStats.onBasePercentage,
+    sluggingPercentage: battingStats.sluggingPercentage,
+    ops: battingStats.ops,
+    vsLeftAtBats: battingStats.vsLeftAtBats,
+    vsLeftHits: battingStats.vsLeftHits,
+    vsLeftAvg: battingStats.vsLeftAvg,
+    vsRightAtBats: battingStats.vsRightAtBats,
+    vsRightHits: battingStats.vsRightHits,
+    vsRightAvg: battingStats.vsRightAvg,
+  }).from(battingStats)
+    .innerJoin(members, eq(battingStats.memberId, members.id))
+    .orderBy(desc(battingStats.battingAvg));
+}
+
+// ── Pitching Stats ──
+export async function getPitchingStatsByMember(memberId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(pitchingStats).where(eq(pitchingStats.memberId, memberId));
+}
+
+export async function listAllPitchingStats() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({
+    id: pitchingStats.id,
+    memberId: pitchingStats.memberId,
+    memberName: members.name,
+    grade: members.grade,
+    position: members.position,
+    period: pitchingStats.period,
+    games: pitchingStats.games,
+    inningsPitched: pitchingStats.inningsPitched,
+    battersFaced: pitchingStats.battersFaced,
+    hitsAllowed: pitchingStats.hitsAllowed,
+    homeRunsAllowed: pitchingStats.homeRunsAllowed,
+    walks: pitchingStats.walks,
+    strikeouts: pitchingStats.strikeouts,
+    earnedRuns: pitchingStats.earnedRuns,
+    runsAllowed: pitchingStats.runsAllowed,
+    strikeoutRate: pitchingStats.strikeoutRate,
+    era: pitchingStats.era,
+    whip: pitchingStats.whip,
+    kPercentage: pitchingStats.kPercentage,
+    bbPercentage: pitchingStats.bbPercentage,
+    firstStrikePercentage: pitchingStats.firstStrikePercentage,
+  }).from(pitchingStats)
+    .innerJoin(members, eq(pitchingStats.memberId, members.id))
+    .orderBy(asc(pitchingStats.era));
+}
+
+// ── Pitch Velocity ──
+export async function getPitchVelocityByMember(memberId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(pitchVelocity).where(eq(pitchVelocity.memberId, memberId));
+}
+
+export async function listAllPitchVelocity() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({
+    id: pitchVelocity.id,
+    memberId: pitchVelocity.memberId,
+    memberName: members.name,
+    grade: members.grade,
+    avgFastball: pitchVelocity.avgFastball,
+    avgBreaking: pitchVelocity.avgBreaking,
+    maxFastball: pitchVelocity.maxFastball,
+    maxBreaking: pitchVelocity.maxBreaking,
+  }).from(pitchVelocity)
+    .innerJoin(members, eq(pitchVelocity.memberId, members.id))
+    .orderBy(desc(pitchVelocity.avgFastball));
+}
+
+// ── Exit Velocity ──
+export async function getExitVelocityByMember(memberId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(exitVelocity).where(eq(exitVelocity.memberId, memberId));
+}
+
+export async function listAllExitVelocity() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({
+    id: exitVelocity.id,
+    memberId: exitVelocity.memberId,
+    memberName: members.name,
+    grade: members.grade,
+    measureDate: exitVelocity.measureDate,
+    avgSpeed: exitVelocity.avgSpeed,
+    maxSpeed: exitVelocity.maxSpeed,
+    avgRank: exitVelocity.avgRank,
+    maxRank: exitVelocity.maxRank,
+  }).from(exitVelocity)
+    .innerJoin(members, eq(exitVelocity.memberId, members.id))
+    .orderBy(asc(exitVelocity.avgRank));
+}
+
+// ── Pulldown Velocity ──
+export async function getPulldownVelocityByMember(memberId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(pulldownVelocity).where(eq(pulldownVelocity.memberId, memberId));
+}
+
+export async function listAllPulldownVelocity() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({
+    id: pulldownVelocity.id,
+    memberId: pulldownVelocity.memberId,
+    memberName: members.name,
+    grade: members.grade,
+    measureDate: pulldownVelocity.measureDate,
+    avgSpeed: pulldownVelocity.avgSpeed,
+    maxSpeed: pulldownVelocity.maxSpeed,
+    avgRank: pulldownVelocity.avgRank,
+    maxRank: pulldownVelocity.maxRank,
+  }).from(pulldownVelocity)
+    .innerJoin(members, eq(pulldownVelocity.memberId, members.id))
+    .orderBy(asc(pulldownVelocity.avgRank));
+}
+
+// ── Physical Measurements ──
+export async function getPhysicalByMember(memberId: number, category?: string) {
+  const db = await getDb();
+  if (!db) return [];
+  const conditions: SQL[] = [eq(physicalMeasurements.memberId, memberId)];
+  if (category) conditions.push(sql`${physicalMeasurements.category} = ${category}`);
+  return db.select().from(physicalMeasurements).where(and(...conditions)).orderBy(asc(physicalMeasurements.measureDate));
+}
+
+export async function listAllPhysical(category: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({
+    id: physicalMeasurements.id,
+    memberId: physicalMeasurements.memberId,
+    memberName: members.name,
+    grade: members.grade,
+    measureDate: physicalMeasurements.measureDate,
+    category: physicalMeasurements.category,
+    value: physicalMeasurements.value,
+  }).from(physicalMeasurements)
+    .innerJoin(members, eq(physicalMeasurements.memberId, members.id))
+    .where(sql`${physicalMeasurements.category} = ${category}`)
+    .orderBy(asc(physicalMeasurements.measureDate), asc(members.name));
+}
+
+// ── Game Results ──
+export async function listGameResults() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(gameResults).orderBy(asc(gameResults.gameDate), asc(gameResults.gameNumber));
+}
+
+// ── Team Stats ──
+export async function getTeamStats() {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(teamStats).limit(1);
+  return result[0] ?? null;
+}
+
+// ── Full member detail (aggregated) ──
+export async function getMemberFullDetail(memberId: number) {
+  const [member, batting, pitching, velocity, exitVel, pulldown, physical] = await Promise.all([
+    getMemberById(memberId),
+    getBattingStatsByMember(memberId),
+    getPitchingStatsByMember(memberId),
+    getPitchVelocityByMember(memberId),
+    getExitVelocityByMember(memberId),
+    getPulldownVelocityByMember(memberId),
+    getPhysicalByMember(memberId),
+  ]);
+  return { member, batting, pitching, velocity, exitVelocity: exitVel, pulldown, physical };
 }

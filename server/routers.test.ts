@@ -210,6 +210,125 @@ describe("reminders router - authorization", () => {
   });
 });
 
+describe("battingStats router - authorization", () => {
+  it("authenticated user can list batting stats", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.battingStats.list();
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("unauthenticated user cannot list batting stats", async () => {
+    const ctx = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.battingStats.list()).rejects.toThrow();
+  });
+
+  it("authenticated user can query batting stats by member", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.battingStats.byMember({ memberId: 1 });
+    expect(Array.isArray(result)).toBe(true);
+  });
+});
+
+describe("pitchingStats router - authorization", () => {
+  it("authenticated user can list pitching stats", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.pitchingStats.list();
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("unauthenticated user cannot list pitching stats", async () => {
+    const ctx = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.pitchingStats.list()).rejects.toThrow();
+  });
+});
+
+describe("velocity router - authorization", () => {
+  it("authenticated user can list pitch velocity", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.velocity.pitchList();
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("authenticated user can list exit velocity", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.velocity.exitList();
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("authenticated user can list pulldown velocity", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.velocity.pulldownList();
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("unauthenticated user cannot list velocity data", async () => {
+    const ctx = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.velocity.pitchList()).rejects.toThrow();
+  });
+});
+
+describe("physical router - authorization", () => {
+  it("authenticated user can list physical data", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.physical.list({ category: "sprint_27m" });
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("authenticated user can query physical data by member", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.physical.byMember({ memberId: 1 });
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("unauthenticated user cannot list physical data", async () => {
+    const ctx = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.physical.list({ category: "sprint_27m" })).rejects.toThrow();
+  });
+});
+
+describe("gameResults router - authorization", () => {
+  it("authenticated user can list game results", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.gameResults.list();
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("unauthenticated user cannot list game results", async () => {
+    const ctx = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.gameResults.list()).rejects.toThrow();
+  });
+});
+
+describe("teamStats router - authorization", () => {
+  it("authenticated user can get team stats", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    // Should return either data or null, but not throw
+    const result = await caller.teamStats.get();
+    expect(result === null || result === undefined || typeof result === 'object').toBe(true);
+  });
+
+  it("unauthenticated user cannot get team stats", async () => {
+    const ctx = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.teamStats.get()).rejects.toThrow();
+  });
+});
+
 describe("input validation", () => {
   it("rejects empty title for schedule creation", async () => {
     const { ctx } = createAdminContext();

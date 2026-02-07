@@ -28,23 +28,36 @@ import {
   Users,
   BarChart3,
   UserX,
-  Bell,
   LogOut,
   PanelLeft,
+  Swords,
+  Activity,
+  Dumbbell,
+  Trophy,
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { Button } from "./ui/button";
+import { Separator } from "./ui/separator";
 
-const menuItems = [
+const mainMenuItems = [
   { icon: LayoutDashboard, label: "ダッシュボード", path: "/" },
   { icon: Calendar, label: "予定表", path: "/schedules" },
   { icon: ClipboardList, label: "練習メニュー", path: "/menus" },
   { icon: Users, label: "部員管理", path: "/members" },
-  { icon: BarChart3, label: "個人成績", path: "/records" },
   { icon: UserX, label: "欠席連絡", path: "/absences" },
 ];
+
+const dataMenuItems = [
+  { icon: Swords, label: "打者成績", path: "/batting" },
+  { icon: Activity, label: "投手成績", path: "/pitching" },
+  { icon: BarChart3, label: "球速・打球速度", path: "/velocity" },
+  { icon: Dumbbell, label: "フィジカル", path: "/physical" },
+  { icon: Trophy, label: "試合結果", path: "/games" },
+];
+
+const allMenuItems = [...mainMenuItems, ...dataMenuItems];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 240;
@@ -133,7 +146,7 @@ function DashboardLayoutContent({
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const activeMenuItem = menuItems.find((item) => item.path === location);
+  const activeMenuItem = allMenuItems.find((item) => item.path === location);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -197,7 +210,49 @@ function DashboardLayoutContent({
 
           <SidebarContent className="gap-0 py-2">
             <SidebarMenu className="px-2 py-1 gap-0.5">
-              {menuItems.map((item) => {
+              {mainMenuItems.map((item) => {
+                const isActive = location === item.path;
+                return (
+                  <SidebarMenuItem key={item.path}>
+                    <SidebarMenuButton
+                      isActive={isActive}
+                      onClick={() => setLocation(item.path)}
+                      tooltip={item.label}
+                      className="h-9 transition-all font-normal text-sm"
+                    >
+                      <item.icon
+                        className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
+                      />
+                      <span className={isActive ? "font-semibold" : ""}>
+                        {item.label}
+                      </span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+
+            {!isCollapsed && (
+              <div className="px-4 py-2">
+                <Separator />
+              </div>
+            )}
+            {isCollapsed && (
+              <div className="px-2 py-1">
+                <Separator />
+              </div>
+            )}
+
+            {!isCollapsed && (
+              <div className="px-4 py-1">
+                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground">
+                  データ分析
+                </span>
+              </div>
+            )}
+
+            <SidebarMenu className="px-2 py-1 gap-0.5">
+              {dataMenuItems.map((item) => {
                 const isActive = location === item.path;
                 return (
                   <SidebarMenuItem key={item.path}>
