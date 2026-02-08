@@ -311,6 +311,14 @@ export const appRouter = router({
   // ── Team Stats ──
   teamStats: router({
     get: protectedProcedure.query(async () => db.getTeamStats()),
+    monthlyTrend: protectedProcedure.query(async () => db.getMonthlyTeamTrend()),
+  }),
+
+  // ── Compare Members ──
+  compare: router({
+    members: protectedProcedure
+      .input(z.object({ memberIds: z.array(z.number()).min(2).max(6) }))
+      .query(async ({ input }) => db.compareMembersData(input.memberIds)),
   }),
 
   // ── Absences ──

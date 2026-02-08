@@ -34,6 +34,7 @@ import {
   Activity,
   Dumbbell,
   Trophy,
+  GitCompareArrows,
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -55,6 +56,7 @@ const dataMenuItems = [
   { icon: BarChart3, label: "球速・打球速度", path: "/velocity" },
   { icon: Dumbbell, label: "フィジカル", path: "/physical" },
   { icon: Trophy, label: "試合結果", path: "/games" },
+  { icon: GitCompareArrows, label: "部員比較", path: "/compare" },
 ];
 
 const allMenuItems = [...mainMenuItems, ...dataMenuItems];

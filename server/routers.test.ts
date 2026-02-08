@@ -358,6 +358,64 @@ describe("teamStats router - authorization", () => {
   });
 });
 
+describe("teamStats.monthlyTrend router - authorization", () => {
+  it("authenticated user can get monthly trend", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.teamStats.monthlyTrend();
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("unauthenticated user cannot get monthly trend", async () => {
+    const ctx = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.teamStats.monthlyTrend()).rejects.toThrow();
+  });
+});
+
+describe("compare.members router - authorization", () => {
+  it("authenticated user can compare members", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.compare.members({ memberIds: [1, 2] });
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBe(2);
+  });
+
+  it("unauthenticated user cannot compare members", async () => {
+    const ctx = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.compare.members({ memberIds: [1, 2] })).rejects.toThrow();
+  });
+
+  it("rejects less than 2 members", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.compare.members({ memberIds: [1] })).rejects.toThrow();
+  });
+
+  it("rejects more than 6 members", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.compare.members({ memberIds: [1, 2, 3, 4, 5, 6, 7] })).rejects.toThrow();
+  });
+
+  it("compare result contains expected structure", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.compare.members({ memberIds: [1, 2] });
+    result.forEach((item: any) => {
+      expect(item).toHaveProperty("member");
+      expect(item).toHaveProperty("batting");
+      expect(item).toHaveProperty("pitching");
+      expect(item).toHaveProperty("physical");
+      expect(item).toHaveProperty("velocity");
+      expect(item).toHaveProperty("exitVelocity");
+      expect(item).toHaveProperty("pulldown");
+    });
+  });
+});
+
 describe("input validation", () => {
   it("rejects empty title for schedule creation", async () => {
     const { ctx } = createAdminContext();

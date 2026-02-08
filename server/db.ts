@@ -452,6 +452,62 @@ export async function getTeamStats() {
   return result[0] ?? null;
 }
 
+// ── Monthly Team Trend (月別チーム成績推移) ──
+export async function getMonthlyTeamTrend() {
+  const db = await getDb();
+  if (!db) return [];
+  // gameResultsからgameDateの月ごとに勝敗・得失点を集計
+  const results = await db.select().from(gameResults).orderBy(asc(gameResults.gameDate));
+  const monthMap = new Map<string, {
+    month: string;
+    games: number;
+    wins: number;
+    losses: number;
+    draws: number;
+    totalRunsScored: number;
+    totalRunsAllowed: number;
+  }>();
+  for (const g of results) {
+    if (!g.gameDate || g.result === 'cancelled') continue;
+    const month = g.gameDate.substring(0, 7); // YYYY-MM
+    const entry = monthMap.get(month) || { month, games: 0, wins: 0, losses: 0, draws: 0, totalRunsScored: 0, totalRunsAllowed: 0 };
+    entry.games++;
+    if (g.result === 'win') entry.wins++;
+    else if (g.result === 'loss') entry.losses++;
+    else if (g.result === 'draw') entry.draws++;
+    entry.totalRunsScored += g.teamScore ?? 0;
+    entry.totalRunsAllowed += g.opponentScore ?? 0;
+    monthMap.set(month, entry);
+  }
+  return Array.from(monthMap.values()).map(m => ({
+    ...m,
+    winRate: m.games > 0 ? Number(((m.wins / m.games) * 100).toFixed(1)) : 0,
+    avgRunsScored: m.games > 0 ? Number((m.totalRunsScored / m.games).toFixed(1)) : 0,
+    avgRunsAllowed: m.games > 0 ? Number((m.totalRunsAllowed / m.games).toFixed(1)) : 0,
+  }));
+}
+
+// ── Compare Members (部員間比較) ──
+export async function compareMembersData(memberIds: number[]) {
+  const db = await getDb();
+  if (!db) return [];
+  const results = await Promise.all(
+    memberIds.map(async (id) => {
+      const [member, batting, pitching, velocity, exitVel, pulldown, physical] = await Promise.all([
+        getMemberById(id),
+        getBattingStatsByMember(id),
+        getPitchingStatsByMember(id),
+        getPitchVelocityByMember(id),
+        getExitVelocityByMember(id),
+        getPulldownVelocityByMember(id),
+        getPhysicalByMember(id),
+      ]);
+      return { member, batting, pitching, velocity, exitVelocity: exitVel, pulldown, physical };
+    })
+  );
+  return results;
+}
+
 // ── Full member detail (aggregated) ──
 export async function getMemberFullDetail(memberId: number) {
   const [member, batting, pitching, velocity, exitVel, pulldown, physical] = await Promise.all([

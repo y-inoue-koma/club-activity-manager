@@ -19,6 +19,7 @@ const PitchingStats = lazy(() => import("./pages/PitchingStats"));
 const VelocityData = lazy(() => import("./pages/VelocityData"));
 const PhysicalData = lazy(() => import("./pages/PhysicalData"));
 const GameResults = lazy(() => import("./pages/GameResults"));
+const CompareMembers = lazy(() => import("./pages/CompareMembers"));
 
 function PageLoader() {
   return (
@@ -48,6 +49,7 @@ function Router() {
           <Route path="/velocity" component={VelocityData} />
           <Route path="/physical" component={PhysicalData} />
           <Route path="/games" component={GameResults} />
+          <Route path="/compare" component={CompareMembers} />
           <Route path="/404" component={NotFound} />
           <Route component={NotFound} />
         </Switch>
