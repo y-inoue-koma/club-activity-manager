@@ -274,6 +274,35 @@ describe("velocity router - authorization", () => {
     const caller = appRouter.createCaller(ctx);
     await expect(caller.velocity.pitchList()).rejects.toThrow();
   });
+
+  it("authenticated user can query pitch velocity by member", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.velocity.pitchByMember({ memberId: 1 });
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("authenticated user can query exit velocity by member", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.velocity.exitByMember({ memberId: 1 });
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("authenticated user can query pulldown velocity by member", async () => {
+    const { ctx } = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.velocity.pulldownByMember({ memberId: 1 });
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("unauthenticated user cannot query velocity by member", async () => {
+    const ctx = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.velocity.pitchByMember({ memberId: 1 })).rejects.toThrow();
+    await expect(caller.velocity.exitByMember({ memberId: 1 })).rejects.toThrow();
+    await expect(caller.velocity.pulldownByMember({ memberId: 1 })).rejects.toThrow();
+  });
 });
 
 describe("physical router - authorization", () => {

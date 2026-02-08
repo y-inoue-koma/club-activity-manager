@@ -282,6 +282,15 @@ export const appRouter = router({
     pitchList: protectedProcedure.query(async () => db.listAllPitchVelocity()),
     exitList: protectedProcedure.query(async () => db.listAllExitVelocity()),
     pulldownList: protectedProcedure.query(async () => db.listAllPulldownVelocity()),
+    pitchByMember: protectedProcedure
+      .input(z.object({ memberId: z.number() }))
+      .query(async ({ input }) => db.getPitchVelocityByMember(input.memberId)),
+    exitByMember: protectedProcedure
+      .input(z.object({ memberId: z.number() }))
+      .query(async ({ input }) => db.getExitVelocityByMember(input.memberId)),
+    pulldownByMember: protectedProcedure
+      .input(z.object({ memberId: z.number() }))
+      .query(async ({ input }) => db.getPulldownVelocityByMember(input.memberId)),
   }),
 
   // ── Physical Measurements ──
