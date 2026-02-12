@@ -60,7 +60,7 @@ export default function Home() {
   const { data: games } = trpc.gameResults.list.useQuery();
   const { data: monthlyTrend } = trpc.teamStats.monthlyTrend.useQuery();
 
-  const recentGames = games?.slice(0, 5) ?? [];
+  const recentGames = games ? [...games].reverse().slice(0, 5) : [];
 
   const chartData = useMemo(() => {
     if (!monthlyTrend) return [];
